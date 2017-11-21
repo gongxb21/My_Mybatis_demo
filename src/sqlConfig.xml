@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<properties resource="db.properties"></properties>
+	
+	<typeAliases>
+	  <!--   针对单个别名定义  type：类型的路径  alias：别名 
+	    <typeAlias type="cn.itcast.mybatis.po.User" alias="user"/>
+	       批量别名定义  指定包名，mybatis自动扫描包中的po类，自动定义别名，别名就是类名（首字母大写或小写都可以）
+			这些事有顺序的，(properties?,settings?,typeAliases?,typeHandlers?,
+			objectFactory?,objectWrapperFactory?,plugins?,environments?,
+			databaseIdProvider?,mappers?.  -->
+	    <package name="mybatis.bean"/>
+	</typeAliases> 
+	
+	
+    <!-- 和spring整合后 environments配置将废除-->
+    <environments default="development">
+        <environment id="development">
+            <!-- 使用jdbc事务管理，事务控制由mybatis-->
+            <transactionManager type="JDBC" />
+            <!-- 数据库连接池,由mybatis管理-->
+            <dataSource type="POOLED">
+            	<!-- 把配置写到配置文件中，不需要双引号，添加了双引号会报错-->
+                <property name="driver" value="${mysql.driver}" />
+                <property name="url" value="${mysql.url}" />
+                <property name="username" value="${mysql.username}" />
+                <property name="password" value="${mysql.password}" />
+            </dataSource>
+        </environment>
+    </environments>
+	 <mappers>
+	 	<mapper resource="mybatis/dao/BookMapper.xml"/>
+	 </mappers> 
+	<!-- 别名定义 -->
+	
+</configuration>

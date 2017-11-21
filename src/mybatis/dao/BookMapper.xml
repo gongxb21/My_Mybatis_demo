@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace 命名空间，作用就是对sql进行分类化管理,理解为sql隔离
+ 注意：使用mapper代理方法开发，namespace有特殊重要的作用
+ -->
+<mapper namespace="BookMapper">
+    <resultMap type="book" id="bookResult">
+        <result property="id" column="id"/>
+        <result property="isbn" column="isbn"/>
+        <result property="path" column="path"/>
+        <result property="title" column="title"/>
+        <result property="subtitle" column="subtitle"/>
+        <result property="originalTitle" column="original_title"/>
+        <result property="marketPrice" column="market_price"/>
+        <result property="intro" column="intro"/>
+        <result property="binding" column="binding"/>
+        <result property="pages" column="pages"/>
+        <result property="author" column="author"/>
+        <result property="publisher" column="publisher"/>
+        <result property="catalog" column="catalog"/>
+        <result property="supply" column="supply"/>
+        <result property="status" column="status"/>
+        <result property="hot" column="hot"/>
+    </resultMap>
+
+	
+    <!-- 在映射文件中配置很多sql语句 -->
+    <!--需求:通过id查询用户表的记录 -->
+    <!-- 通过select执行数据库查询
+     id:标识映射文件中的sql，称为statement的id
+     将sql语句封装到mappedStatement对象中，所以将id称为statement的id
+     parameterType:指定输入参数的类型
+     #{}标示一个占位符,
+     #{value}其中value表示接收输入参数的名称，如果输入参数是简单类型，那么#{}中的值可以任意。
+
+     resultType：指定sql输出结果的映射的java对象类型，select指定resultType表示将单条记录映射成java对象
+     /hhh/src/mybatis/bean/Book.java
+     -->
+    <select id="findBookById" parameterType="java.lang.String" resultType="book">
+        SELECT * FROM  ssm_book  WHERE id=#{value}
+    </select>
+
+    <!-- 根据用户名称模糊查询用户信息，可能返回多条
+    resultType：指定就是单条记录所映射的java对象类型
+    ${}:表示拼接sql串，将接收到参数的内容不加任何修饰拼接在sql中。
+    使用${}拼接sql，引起 sql注入
+    ${value}：接收输入参数的内容，如果传入类型是简单类型，${}中只能使用value
+     -->
+    <select id="findBookByName" parameterType="java.lang.String" resultType="book">
+        SELECT * FROM ssm_book WHERE title LIKE '%${value}%'
+    </select>
+	
+	<select id="getBookCount" resultType="int">
+		select count(1) from ssm_book;
+	</select>
+	<!-- 为什么执行update语句，数据库不更新 ,因为没有提交事务 ？  -->
+	<update id="updateBook" parameterType="book">
+		UPDATE ssm_book SET title=#{title} WHERE id=#{id}
+	</update>
+	<delete id="delBook" parameterType="book">
+		delete from ssm_book  where id=#{id}
+	</delete>
+	<insert id="insertBook" parameterType="book">
+		insert into ssm_book( id,title,isbn,intro,catalog) values(
+		#{id},#{title},#{isbn},#{intro},#{catalog}
+		)
+	</insert>
+</mapper>
