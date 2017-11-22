@@ -6,7 +6,7 @@
  注意：使用mapper代理方法开发，namespace有特殊重要的作用
  -->
 <mapper namespace="BookMapper">
-    <resultMap type="book" id="bookResult">
+    <resultMap type="bookCd" id="bookCdResult">
         <result property="id" column="id"/>
         <result property="isbn" column="isbn"/>
         <result property="path" column="path"/>
@@ -23,6 +23,17 @@
         <result property="supply" column="supply"/>
         <result property="status" column="status"/>
         <result property="hot" column="hot"/>
+        <!-- 一一映射 -->
+        <association property="cd" javaType="mybatis.bean.CD">
+        	<id column="book_id" property="bookId"></id>
+        	<result property="size" column="size"></result>
+        	<result property="name" column="name"></result>
+        </association> 
+        <!--一对多 ： 有这种情况，如果在查询字段中有主键，那么只会查询出一条结果 -->  
+        <collection property="chapters" ofType="mybatis.bean.Chapter">
+        	<id column="id" property="id"></id>
+        	<result column="names" property="name"></result>
+        </collection>      
     </resultMap>
 
 	
@@ -36,10 +47,37 @@
      #{value}其中value表示接收输入参数的名称，如果输入参数是简单类型，那么#{}中的值可以任意。
 
      resultType：指定sql输出结果的映射的java对象类型，select指定resultType表示将单条记录映射成java对象
-     /hhh/src/mybatis/bean/Book.java
-     -->
-    <select id="findBookById" parameterType="java.lang.String" resultType="book">
-        SELECT * FROM  ssm_book  WHERE id=#{value}
+     
+     resultType：使用resultType实现较为简单，如果pojo中没有包括查询出来的列名，需要增加列名对应的属性，即可完成映射。如果没有查询结果的特殊要求建议使用resultType。
+	 resultMap：需要单独定义resultMap，实现有点麻烦，如果对查询结果有特殊的要求，使用resultMap可以完成将关联查询映射pojo的属性中。
+	 resultMap可以实现延迟加载，resultType无法实现延迟加载
+	 
+	 
+
+    resultType
+	        作用：将查询结果按照sql列名pojo属性名一致性映射到pojo中。
+	        场合：常见一些明细记录的展示，比如用户购买商品明细，将关联查询信息全部展示在页面时，此时可直接使用resultType将每一条记录映射到pojo中，在前端页面遍历list（list中是pojo）即可。
+
+    resultMap
+	       使用association和collection完成一对一和一对多高级映射（对结果有特殊的映射要求）。
+
+	association：
+	    作用：将关联查询信息映射到一个pojo对象中。
+	    场合：为了方便查询关联信息可以使用association将关联订单信息映射为用户对象的pojo属性中，比如：查询订单及关联用户信息。
+
+	使用resultType无法将查询结果映射到pojo对象的pojo属性中，根据对结果集查询遍历的需要选择使用resultType还是resultMap。
+
+	collection：
+	    作用：将关联查询信息映射到一个list集合中。
+	    场合：为了方便查询遍历关联信息可以使用collection将关联信息映射到list集合中，比如：查询用户权限范围模块及模块下的菜单，可使用collection将模块映射到模块list中，将菜单列表映射到模块对象的菜单list属性中，这样的作的目的也是方便对查询结果集进行遍历查询。如果使用resultType无法将查询结果映射到list集合中。
+		 
+      -->
+    <select id="findBookById" parameterType="java.lang.String" resultMap="bookCdResult">
+        SELECT b.isbn ,d.*,c.name names 
+        FROM  ssm_book b,cd d,chapter c  
+        	 WHERE  b.id=d.book_id 
+        	 and  c.book_id=b.id
+        	  and b.id=#{id}
     </select>
 
     <!-- 根据用户名称模糊查询用户信息，可能返回多条
@@ -52,8 +90,9 @@
         SELECT * FROM ssm_book WHERE title LIKE '%${value}%'
     </select>
 	
-	<select id="getBookCount" resultType="int">
-		select count(1) from ssm_book;
+	<select id="getBookCount" resultType="int" parameterType="bookQueryVo">
+		select count(1) from ssm_book 
+		<include refid="ids2"></include>
 	</select>
 	<!-- 为什么执行update语句，数据库不更新 ,因为没有提交事务 ？  -->
 	<update id="updateBook" parameterType="book">
@@ -67,4 +106,38 @@
 		#{id},#{title},#{isbn},#{intro},#{catalog}
 		)
 	</insert>
+	<select id="getBooks" parameterType="bookQueryVo" resultType="book">
+		select * from ssm_book  
+		<include refid="wherecause"></include>		
+	</select>
+	<sql id="wherecause">
+		<where>
+			<if test="book.id!=null">
+				and id=#{book.id}
+			</if>
+			<if test="book.title!=null">
+				and title=#{book.title}
+			</if>
+			<if test="book.isbn!=null">
+				and isbn=#{book.isbn}
+			</if>
+		</where>
+	</sql>
+	<sql id="ids">
+	<where>
+		id in
+		<foreach collection="list" item="id" close=")" open="(" separator=",">
+		 	#{id}
+		</foreach>
+	</where>
+	</sql>
+	<sql id="ids2">
+	<where>
+	<!-- 这里的list，是对象属性中的list，并不是集合的list	 -->
+		<foreach collection="list" item="id" close=")" open="(" separator="or">
+		 	id=#{id}
+		</foreach>
+	</where>
+	</sql>
+	
 </mapper>
