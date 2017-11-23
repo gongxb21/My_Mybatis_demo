@@ -5,7 +5,14 @@
 <configuration>
 
 	<properties resource="db.properties"></properties>
-	
+	<settings>
+	    <!-- 打开延迟加载 的开关 -->
+	    <setting name="lazyLoadingEnabled" value="true"/>
+	    <!-- 将积极加载改为消极加载即按需要加载 -->
+	    <setting name="aggressiveLazyLoading" value="false"/>
+	    <!-- 开启二级缓存 -->
+	   <!-- <setting name="cacheEnabled" value="true"/>-->
+	</settings>
 	<typeAliases>
 	  <!--   针对单个别名定义  type：类型的路径  alias：别名 
 	    <typeAlias type="cn.itcast.mybatis.po.User" alias="user"/>

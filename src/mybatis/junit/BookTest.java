@@ -70,6 +70,7 @@ public class BookTest {
         // สอทลืสิด
         sqlSession.close();
 	}
+
 	
 	public void updateBook() throws IOException {
 		inputStream =  Resources.getResourceAsStream(resource);

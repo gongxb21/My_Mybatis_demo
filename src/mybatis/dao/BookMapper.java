@@ -13,4 +13,5 @@ public interface BookMapper {
 	public int delBook(Book book);
 	public int insertBook(Book book);
 	public List<Book> getBooks(BookQueryVo bqv);
+	public Book getBookByLazyLoading();
 }

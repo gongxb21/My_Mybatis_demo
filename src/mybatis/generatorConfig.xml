@@ -14,7 +14,7 @@
 
 		<commentGenerator>
 		<!-- 是否取消注释 -->
-			<property name="suppressAllComments" value="true" />
+			<property name="suppressAllComments" value="false" />
 			 <!-- 是否生成注释代时间戳 -->
 			<property name="suppressDate" value="true" />
 		</commentGenerator>
@@ -32,8 +32,8 @@
 		<!-- 指定dao类生成在哪个包 -->
 		<sqlMapGenerator targetPackage="mybatis.dao"
 			targetProject="hhh/src" />
-		<javaClientGenerator type="XMLMAPPER" targetPackage="mybatis.dao" targetProject="hhh/src" />
-<!-- 		<table tableName="account" domainObjectName="Account" /> 
+	<!--	<javaClientGenerator type="XMLMAPPER" targetPackage="mybatis.dao" targetProject="hhh/src" />
+ 		<table tableName="account" domainObjectName="Account" /> 
 			
 		<table tableName="supplier" domainObjectName="Supplier" />
 			<table tableName="sys_param" domainObjectName="SysParam" />
@@ -42,7 +42,10 @@
 				<table tableName="buy_order" domainObjectName="BuyOrder" />
 				<table tableName="buy_order_detail" domainObjectName="BuyOrderDetail" />
 				-->	
-				<table tableName="ssm_book" domainObjectName="Book" />
-	
+	<table schema="general" tableName="orders" domainObjectName="Order"
+    enableCountByExample="false" enableUpdateByExample="false" enableDeleteByExample="false"
+    enableSelectByExample="false" selectByExampleQueryId="false" >
+    <property name="useActualColumnNames" value="true"/>
+</table>
 	</context>
 </generatorConfiguration>
